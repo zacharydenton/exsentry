@@ -19,7 +19,7 @@ defmodule ExSentry do
   end
 
   def capture_exception(exception, attrs \\ %{}) do
-    trace = System.stacktrace
+    trace = System.stacktrace |> Enum.drop(1)
     GenServer.cast(:exsentry, {:capture_exception, exception, trace, attrs})
   end
 

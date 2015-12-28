@@ -20,6 +20,8 @@ defmodule ExSentry.Mixfile do
   defp deps do
     [
       {:fuzzyurl, "~> 0.2.0"},
+      {:uuid, "~> 1.1"},
+      {:timex, "~> 0.19.2"},
       {:ex_spec, "~> 1.0.0", only: :test},
       {:coverex, "~> 1.4.7", only: :test},
     ]
