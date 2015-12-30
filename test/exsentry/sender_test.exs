@@ -21,7 +21,8 @@ defmodule ExSentry.SenderTest do
         post: fn (_url, _opts) -> @response_2xx end
       ] do
         send_request(sender, "", [], "")
-        assert(:success == GenServer.call(sender, :state)[:status])
+        state = GenServer.call(sender, :state)
+        assert(:success == state.status)
       end
     end
 
@@ -30,7 +31,8 @@ defmodule ExSentry.SenderTest do
         post: fn (_url, _opts) -> @response_3xx end
       ] do
         send_request(sender, "", [], "")
-        assert(:max_retries == GenServer.call(sender, :state)[:status])
+        state = GenServer.call(sender, :state)
+        assert(:max_retries == state.status)
       end
     end
 
@@ -39,7 +41,8 @@ defmodule ExSentry.SenderTest do
         post: fn (_url, _opts) -> @response_4xx end
       ] do
         send_request(sender, "", [], "")
-        assert(:client_error == GenServer.call(sender, :state)[:status])
+        state = GenServer.call(sender, :state)
+        assert(:client_error == state.status)
       end
     end
 
@@ -48,7 +51,8 @@ defmodule ExSentry.SenderTest do
         post: fn (_url, _opts) -> @response_5xx end
       ] do
         send_request(sender, "", [], "")
-        assert(:max_retries == GenServer.call(sender, :state)[:status])
+        state = GenServer.call(sender, :state)
+        assert(:max_retries == state.status)
       end
     end
 
@@ -57,9 +61,11 @@ defmodule ExSentry.SenderTest do
         post: fn (_url, _opts) -> @response_1xx end
       ] do
         send_request(sender, "", [], "")
-        assert(:unhandled_status == GenServer.call(sender, :state)[:status])
+        state = GenServer.call(sender, :state)
+        assert(:unhandled_status == state.status)
       end
     end
-
   end
+
 end
+

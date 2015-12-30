@@ -15,7 +15,7 @@ defmodule ExSentry.Utils do
   """
   def versions do
     Application.loaded_applications
-    |> Enum.reduce({}, fn ({app, _desc, ver}, acc) ->
+    |> Enum.reduce(%{}, fn ({app, _desc, ver}, acc) ->
          Map.put(acc, app, to_string(ver))
        end)
   end

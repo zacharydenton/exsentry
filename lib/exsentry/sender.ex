@@ -1,11 +1,19 @@
 defmodule ExSentry.Sender do
-  require Logger
-
   @moduledoc ~S"""
-  A process which handles the sending of a single Sentry request.
+  A GenServer which handles the sending of a single Sentry request.
   Invoked from ExSentry.Server.
   """
 
+  defmodule State do
+    defstruct delay: 1000,
+              timeout: 3000,
+              retries: 3,
+              status: :launched,
+              logging: true,
+              testing: false
+  end
+
+  require Logger
   use GenServer
 
   @doc ~S"""
@@ -35,17 +43,9 @@ defmodule ExSentry.Sender do
   end
 
 
-  @defaults %{delay: 1000,
-              timeout: 3000,
-              retries: 3,
-              status: :launched,
-              logging: true,
-              testing: false}
-
   def init(state) do
-    {:ok, Map.merge(@defaults, state)}
+    {:ok, Map.merge(%State{}, state)}
   end
-
 
   ## Returns `state`.  Useful for testing.
   def handle_call(:state, _from, state) do
@@ -54,34 +54,33 @@ defmodule ExSentry.Sender do
 
   ## Stops this process unless state[:testing] == true.
   def handle_cast(:stop, state) do
-    if state[:testing], do: {:noreply, state}, else: {:stop, :normal, state}
+    if state.testing, do: {:noreply, state}, else: {:stop, :normal, state}
   end
 
   ## Handles the sending of requests.
   def handle_cast({:send, url, headers, body, retries}, state) do
-    delay = state[:delay] * :math.pow(2, retries)
+    delay = state.delay * :math.pow(2, retries)
     delay_with_jitter = trunc(delay + 0.1 * (:random.uniform) * delay)
-    log = if state[:logging] do
+    log = if state.logging do
             fn (level, msg) -> Logger.log(level, msg) end
           else
             fn (_, _) -> nil end
           end
 
-    resp = try do
-             HTTPotion.post(url, timeout: state[:timeout], body: body, headers: headers)
-           rescue
-              e ->
-                %{status_code: 555,
-                  exception: e,
-                  headers: ["X-Sentry-Error": "Request timed out"]}
-           end
-    x_sentry_error = Keyword.get(resp.headers, :"X-Sentry-Error", "(no error given)")
-
-    if (retries >= state[:retries]) do
-      log.(:error, "ExSentry got HTTP status #{resp.status_code}, max retries reached. Aborting.")
-      log.(:error, "X-Sentry-Error: #{x_sentry_error}")
+    if (retries >= state.retries) do
+      log.(:error, "ExSentry reached max retries, aborting.")
       stop(self, %{state | status: :max_retries})
     else
+      resp = try do
+               HTTPotion.post(url, timeout: state.timeout, body: body, headers: headers)
+             rescue
+                e ->
+                  %{status_code: 555,
+                    exception: e,
+                    headers: ["X-Sentry-Error": "Request timed out"]}
+             end
+      x_sentry_error = Keyword.get(resp.headers, :"X-Sentry-Error", "(no error given)")
+
       case div(resp.status_code, 100) do
         2 -> # success
           stop(self, %{state | status: :success})
