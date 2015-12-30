@@ -38,5 +38,5 @@ build:
     - script:
         name: coveralls
         code: |
-          mix coveralls
+          mix coveralls.post
 
