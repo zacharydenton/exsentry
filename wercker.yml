@@ -38,5 +38,7 @@ build:
     - script:
         name: coveralls
         code: |
-          mix coveralls.post
+          mix coveralls.post --sha \
+            $(git log -1 2>/dev/null | sed -e 's/^commit \(\d*\)/\1/p; d')
+
 
