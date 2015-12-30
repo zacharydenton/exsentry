@@ -1,7 +1,7 @@
 defmodule ExSentry.SenderTest do
   use ExSpec, async: false
   import Mock
-  import ExSentry.Sender, only: [send_request: 4]
+  import ExSentry.Sender, only: [send_request: 3, send_request: 4]
 
   setup do
     {:ok, pid} = GenServer.start_link(ExSentry.Sender,
@@ -14,6 +14,18 @@ defmodule ExSentry.SenderTest do
   @response_3xx %{status_code: 301, headers: ["Location": "https://example.com"]}
   @response_4xx %{status_code: 400, headers: ["X-Sentry-Error": "omg"]}
   @response_5xx %{status_code: 503, headers: ["X-Sentry-Error": "lol"]}
+
+  describe "send_request/3" do
+    it "launches and stops server automatically" do
+      with_mock HTTPotion, [
+        post: fn (_url, _opts) -> @response_2xx end
+      ] do
+        pid = send_request("", [], "")
+        :timer.sleep(300)
+        assert(false == Process.alive?(pid))
+      end
+    end
+  end
 
   describe "send_request/4" do
     it "handles 2xx", %{sender: sender} do
@@ -64,6 +76,17 @@ defmodule ExSentry.SenderTest do
         state = GenServer.call(sender, :state)
         assert(:unhandled_status == state.status)
       end
+    end
+
+    it "handles timeouts", %{sender: sender} do
+      with_mock HTTPotion, [
+        post: fn (_url, _opts) -> :meck.exception(:error, :lol) end
+      ] do
+        send_request(sender, "", [], "")
+        state = GenServer.call(sender, :state)
+        assert(:max_retries == state.status)
+      end
+
     end
   end
 
