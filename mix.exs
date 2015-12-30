@@ -7,7 +7,12 @@ defmodule ExSentry.Mixfile do
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     test_coverage: [tool: Coverex.Task],
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: [
+       "coveralls": :test,
+       "coveralls.detail": :test,
+       "coveralls.post": :test
+     ],
      deps: deps]
   end
 
@@ -25,8 +30,8 @@ defmodule ExSentry.Mixfile do
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
       {:httpotion, "~> 2.1.0"},
       {:ex_spec, "~> 1.0.0", only: :test},
-      {:coverex, "~> 1.4.7", only: :test},
       {:mock, "~> 0.1.1", only: :test},
+      {:excoveralls, "~> 0.4.3", only: :test},
     ]
   end
 end
