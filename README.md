@@ -1,5 +1,8 @@
 # ExSentry
 
+[![wercker status](https://app.wercker.com/status/e3f67da2ef0e409a62bb6bd65a50e7d7/s/master "wercker status")](https://app.wercker.com/project/bykey/e3f67da2ef0e409a62bb6bd65a50e7d7)
+[![Coverage Status](https://coveralls.io/repos/appcues/exsentry/badge.svg?branch=master&service=github)](https://coveralls.io/github/appcues/exsentry?branch=master)
+
 An Elixir library for sending exception events to
 [Sentry](https://getsentry.com).
 
