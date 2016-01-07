@@ -4,7 +4,7 @@
   "ex_spec": {:hex, :ex_spec, "1.0.0"},
   "excoveralls": {:hex, :excoveralls, "0.4.3"},
   "exjsx": {:hex, :exjsx, "3.2.0"},
-  "fuzzyurl": {:hex, :fuzzyurl, "0.8.0"},
+  "fuzzyurl": {:hex, :fuzzyurl, "0.8.1"},
   "hackney": {:hex, :hackney, "1.4.7"},
   "httpoison": {:hex, :httpoison, "0.8.0"},
   "httpotion": {:hex, :httpotion, "2.1.0"},

@@ -1,7 +1,7 @@
 defmodule ExSentry.Sender do
   @moduledoc ~S"""
   A GenServer which handles the sending of a single Sentry request.
-  Invoked from ExSentry.Server.
+  Invoked from ExSentry.Client.
   """
 
   defmodule State do

@@ -24,7 +24,7 @@ defmodule ExSentry.Mixfile do
 
   defp deps do
     [
-      {:fuzzyurl, "~> 0.8.0"},
+      {:fuzzyurl, "~> 0.8.1"},
       {:uuid, "~> 1.1"},
       {:timex, "~> 0.19.2"},
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
