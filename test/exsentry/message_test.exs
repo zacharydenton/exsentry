@@ -39,21 +39,33 @@ defmodule ExSentry.MessageTest do
     {:elixir, :eval_forms, 4, [file: 'src/elixir.erl']}
   ]
 
-  @fst [
-    %{filename: 'src/elixir.erl', function: "eval_forms/4", module: :elixir},
-    %{filename: 'src/elixir.erl', function: "quoted_to_erl/3", lineno: 228, module: :elixir},
-    %{filename: 'src/elixir_translator.erl', function: "translate/2", lineno: 263, module: :elixir_translator},
-    %{function: "mapfoldl/3", lineno: 1353, module: :lists},
-    %{filename: 'src/elixir_translator.erl', function: "translate_arg/3", lineno: 349, module: :elixir_translator},
+  @fst %{frames: [
+    %{filename: "erl_internal.erl", function: "op_type/2", lineno: 212, module: :erl_internal},
+    %{filename: "src/elixir_translator.erl", function: "guard_op/2", lineno: 309, module: :elixir_translator},
     %{module: :elixir_translator, function: "translate/2"},
-    %{filename: 'src/elixir_translator.erl', function: "guard_op/2", lineno: 309, module: :elixir_translator},
-    %{filename: 'erl_internal.erl', function: "op_type/2", lineno: 212, module: :erl_internal}
-  ]
+    %{filename: "src/elixir_translator.erl", function: "translate_arg/3", lineno: 349, module: :elixir_translator},
+    %{function: "mapfoldl/3", lineno: 1353, module: :lists},
+    %{filename: "src/elixir_translator.erl", function: "translate/2", lineno: 263, module: :elixir_translator},
+    %{filename: "src/elixir.erl", function: "quoted_to_erl/3", lineno: 228, module: :elixir},
+    %{filename: "src/elixir.erl", function: "eval_forms/4", module: :elixir},
+  ]}
 
   describe "format_stacktrace" do
     it "formats stacktrace correctly" do
       fst = ExSentry.Message.format_stacktrace(@stacktrace)
       assert(@fst == fst)
+    end
+  end
+
+  describe "format_headers" do
+    it "merges header values correctly" do
+      req_headers = [
+        {"header1", "value1"},
+        {"header2", "value2"},
+        {"header1", "value3"}
+      ]
+      headers = %{"header1" => "value1, value3", "header2" => "value2"}
+      assert(headers == ExSentry.Message.format_headers(req_headers))
     end
   end
 end

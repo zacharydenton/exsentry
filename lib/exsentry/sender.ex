@@ -58,7 +58,7 @@ defmodule ExSentry.Sender do
   end
 
   ## Handles the sending of requests.
-  def handle_cast({:send, url, headers, body, retries}, state) do
+  def handle_cast({:send, url, headers, body, retries}=arg, state) do
     delay = state.delay * :math.pow(2, retries)
     delay_with_jitter = trunc(delay + 0.1 * (:random.uniform) * delay)
     log = if state.logging do
@@ -66,13 +66,14 @@ defmodule ExSentry.Sender do
           else
             fn (_, _) -> nil end
           end
+    body_str = body |> Poison.encode!
 
     if (retries >= state.retries) do
       log.(:error, "ExSentry reached max retries, aborting.")
       stop(self, %{state | status: :max_retries})
     else
       resp = try do
-               HTTPotion.post(url, timeout: state.timeout, body: body, headers: headers)
+               HTTPotion.post(url, timeout: state.timeout, body: body_str, headers: headers)
              rescue
                 e ->
                   %{status_code: 555,

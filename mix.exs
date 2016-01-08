@@ -18,7 +18,7 @@ defmodule ExSentry.Mixfile do
 
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :httpotion],
+    [applications: [:logger, :httpotion, :timex],
      mod: {ExSentry, []}]
   end
 
@@ -29,6 +29,7 @@ defmodule ExSentry.Mixfile do
       {:timex, "~> 0.19.2"},
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
       {:httpotion, "~> 2.1.0"},
+      {:poison, "~> 1.5.0"},
       {:ex_spec, "~> 1.0.0", only: :test},
       {:mock, "~> 0.1.1", only: :test},
       {:excoveralls, "~> 0.4.3", only: :test},

@@ -6,9 +6,10 @@ defmodule ExSentry.Message do
   (optional, defaults to now).
   """
   def get_auth_header_value(%{version: version, key: key, secret: secret}=args) do
+    ts = Map.get(args, :timestamp) || unixtime
     "Sentry sentry_version=7, " <>
     "sentry_client=\"ExSentry/#{version}\", " <>
-    "sentry_timestamp=#{args[:timestamp] || unixtime}, " <>
+    "sentry_timestamp=#{ts}, " <>
     "sentry_key=#{key}, " <>
     "sentry_secret=#{secret}"
   end
@@ -20,13 +21,11 @@ defmodule ExSentry.Message do
 
 
   @doc ~S"""
-  Given the output of `System.stacktrace`, returns a list of JSON-
-  compatible maps in Sentry's `stacktrace` format, oldest to newest.
+  Given the output of `System.stacktrace`, returns a JSON- compatible
+  structure in Sentry's `stacktrace` format, oldest to newest.
   """
   def format_stacktrace(stacktrace) do
-    stacktrace
-    |> Enum.reverse
-    |> Enum.map(&format_stacktrace_entry(&1))
+    %{frames: stacktrace |> Enum.map(&format_stacktrace_entry(&1))}
   end
 
   defp format_stacktrace_entry(entry) do
@@ -44,14 +43,33 @@ defmodule ExSentry.Message do
     file = file_and_line_dict[:file]
     line = file_and_line_dict[:line]
     cond do
-      file && line -> %{filename: file, lineno: line}
-      file -> %{filename: file}
+      file && line -> %{filename: to_string(file), lineno: line}
+      file -> %{filename: to_string(file)}
       line -> %{lineno: line}
       true -> %{}
     end
   end
 
 
+  @doc ~S"""
+  Given a list of {headername, value} tuples, returns a map of
+  %{headername => merged_values} pairs.
+  """
+  def format_headers(req_headers) do
+    Enum.reduce req_headers, %{}, fn ({key, value}, acc) ->
+      if Map.has_key?(acc, key) do
+        oldval = Map.get(acc, key)
+        Map.put(acc, key, "#{oldval}, #{value}")
+      else
+        Map.put(acc, key, value)
+      end
+    end
+  end
+
+
+  @doc ~S"""
+  Returns a JSON-compatible body for Sentry HTTP requests.
+  """
   def basic_payload(opts \\ []) do
     versions = ExSentry.Utils.versions
     event_id = UUID.uuid4() |> String.replace("-", "")
@@ -63,6 +81,8 @@ defmodule ExSentry.Message do
     message = opts[:message] |> String.slice(0..999)
     level = opts[:level] || :error
     logger = opts[:logger] || "ExSentry #{versions[:exsentry]}"
+    hostname = opts[:hostname] || :inet.gethostname |> elem(1) |> to_string
+    stacktrace = opts[:stacktrace]
     culprit = opts[:culprit]
     hostname = opts[:hostname]
     tags = opts[:tags]
@@ -70,21 +90,27 @@ defmodule ExSentry.Message do
 
     %{
       event_id: event_id,
-      message: message,
+      platform: "other",   ## no love for Elixir yet
+      release: versions[:exsentry],
+      modules: versions,
       timestamp: timestamp,
+
+      message: message,
       level: level,
       logger: logger,
-      platform: "other",   ## no love for Elixir yet
-
+      hostname: hostname,
+      stacktrace: stacktrace,
       culprit: culprit,
       server_name: hostname,
-      release: versions[:exsentry],
       tags: tags,
-      modules: ExSentry.Utils.versions,
       extra: extra
     }
   end
 
+  @doc ~S"""
+  Merges two maps of tags, returning a JSON-compatible structure like
+  [ [tag1, value1], [tag2, value2], ... ].  Allows duplicates.
+  """
   def merge_tags(global_tags, tags) do
     (Map.to_list(global_tags) ++ Map.to_list(tags))
     |> Enum.map(fn ({k, v}) -> [k, v] end)
