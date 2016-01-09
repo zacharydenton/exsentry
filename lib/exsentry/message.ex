@@ -21,53 +21,6 @@ defmodule ExSentry.Message do
 
 
   @doc ~S"""
-  Given the output of `System.stacktrace`, returns a JSON- compatible
-  structure in Sentry's `stacktrace` format, oldest to newest.
-  """
-  def format_stacktrace(stacktrace) do
-    %{frames: stacktrace |> Enum.map(&format_stacktrace_entry(&1))}
-  end
-
-  defp format_stacktrace_entry(entry) do
-    case entry do
-      {module, fname, arity, file_and_line} ->
-        arity = if is_list(arity), do: Enum.count(arity), else: arity
-        Map.merge(file_and_line_map(file_and_line), %{
-          function: "#{fname}/#{arity}",
-          module: module,
-        })
-    end
-  end
-
-  defp file_and_line_map(file_and_line_dict) do
-    file = file_and_line_dict[:file]
-    line = file_and_line_dict[:line]
-    cond do
-      file && line -> %{filename: to_string(file), lineno: line}
-      file -> %{filename: to_string(file)}
-      line -> %{lineno: line}
-      true -> %{}
-    end
-  end
-
-
-  @doc ~S"""
-  Given a list of {headername, value} tuples, returns a map of
-  %{headername => merged_values} pairs.
-  """
-  def format_headers(req_headers) do
-    Enum.reduce req_headers, %{}, fn ({key, value}, acc) ->
-      if Map.has_key?(acc, key) do
-        oldval = Map.get(acc, key)
-        Map.put(acc, key, "#{oldval}, #{value}")
-      else
-        Map.put(acc, key, value)
-      end
-    end
-  end
-
-
-  @doc ~S"""
   Returns a JSON-compatible body for Sentry HTTP requests.
   """
   def basic_payload(opts \\ []) do
@@ -87,6 +40,7 @@ defmodule ExSentry.Message do
     hostname = opts[:hostname]
     tags = opts[:tags]
     extra = opts[:extra]
+    request = opts[:request]
 
     %{
       event_id: event_id,
@@ -103,13 +57,19 @@ defmodule ExSentry.Message do
       culprit: culprit,
       server_name: hostname,
       tags: tags,
-      extra: extra
+      extra: extra,
+      request: request
     }
   end
 
   @doc ~S"""
   Merges two maps of tags, returning a JSON-compatible structure like
   [ [tag1, value1], [tag2, value2], ... ].  Allows duplicates.
+
+      iex> t1 = %{a: 1, b: 2}
+      iex> t2 = %{a: 3}
+      iex> ExSentry.Message.merge_tags(t1, t2)
+      [ [:a, 1], [:b, 2], [:a, 3] ]
   """
   def merge_tags(global_tags, tags) do
     (Map.to_list(global_tags) ++ Map.to_list(tags))

@@ -2,6 +2,7 @@ defmodule ExSentry.SenderTest do
   use ExSpec, async: false
   import Mock
   import ExSentry.Sender, only: [send_request: 3, send_request: 4]
+  doctest ExSentry.Sender
 
   setup do
     {:ok, pid} = GenServer.start_link(ExSentry.Sender,

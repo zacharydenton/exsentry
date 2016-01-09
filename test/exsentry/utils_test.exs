@@ -1,6 +1,5 @@
 defmodule ExSentry.UtilsTest do
   use ExSpec, async: true
-
   doctest ExSentry.Utils
 
   describe "version" do

@@ -77,7 +77,7 @@ defmodule ExSentry.Client do
     {:noreply, state}
   end
 
-  def handle_cast(_, %State{status: :no_dsn}=state) do
+  def handle_cast(_, %State{status: :no_dsn}) do
     raise "Sentry DSN is not configured.  " <>
           "Add `config :exsentry, dsn: \"your-dsn-here\"` to `config.exs`."
   end
@@ -99,8 +99,8 @@ defmodule ExSentry.Client do
   def capture_exception(exception, trace, opts, state) do
     opts
     |> Dict.put(:message, Exception.message(exception))
+    |> Dict.put(:stacktrace, ExSentry.Message.format_stacktrace(trace))
     |> ExSentry.Message.basic_payload
-    |> Map.put(:stacktrace, ExSentry.Message.format_stacktrace(trace))
     |> send_payload(state)
   end
 
