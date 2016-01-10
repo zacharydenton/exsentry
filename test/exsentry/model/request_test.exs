@@ -24,7 +24,7 @@ defmodule ExSentry.Model.RequestTest do
     query_string: "your=mom",
     req_headers: @req_headers,
     remote_ip: {127,0,0,1},
-    cookies: %{"mm" => "food"},
+    req_cookies: %{"mm" => "food"},
   }
 
   @request %ExSentry.Model.Request{
@@ -42,12 +42,6 @@ defmodule ExSentry.Model.RequestTest do
   describe "from_conn" do
     it "makes a valid ExSentry.Model.Request from conn" do
       assert(@request == from_conn(@conn))
-    end
-  end
-
-  describe "format_headers" do
-    it "merges header values correctly" do
-      assert(@headers == format_headers(@req_headers))
     end
   end
 

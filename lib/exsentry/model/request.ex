@@ -1,4 +1,9 @@
 defmodule ExSentry.Model.Request do
+  @moduledoc ~S"""
+  ExSentry.Model.Request represents an object adhering to the Sentry
+  `request` interface.
+  """
+
   @derive [Poison.Encoder]
 
   defstruct url: nil,
@@ -15,8 +20,13 @@ defmodule ExSentry.Model.Request do
   """
   def from_conn(conn) do
     {:ok, data, _conn} = Plug.Conn.read_body(conn, length: 8192)
-    headers = conn.req_headers |> format_headers
-    cookies = conn.cookies || (conn |> Plug.Conn.fetch_cookies).cookies
+    headers = conn.req_headers |> ExSentry.Utils.merge_http_headers
+    cookies = case conn.req_cookies do
+                %Plug.Conn.Unfetched{} ->
+                  (conn |> Plug.Conn.fetch_cookies).req_cookies
+                c ->
+                  c
+              end
     %ExSentry.Model.Request{
       url: conn.request_path,
       method: conn.method,
@@ -32,20 +42,5 @@ defmodule ExSentry.Model.Request do
 
   defp format_ip({a, b, c, d}), do: "#{a}.#{b}.#{c}.#{d}"
 
-  @doc ~S"""
-  Given a list of {headername, value} tuples, returns a map of
-  %{headername => merged_values} pairs suitable for inclusion in a
-  Sentry "Http" object as `headers`.
-  """
-  def format_headers(req_headers) do
-    Enum.reduce req_headers, %{}, fn ({key, value}, acc) ->
-      if Map.has_key?(acc, key) do
-        oldval = Map.get(acc, key)
-        Map.put(acc, key, "#{oldval}, #{value}")
-      else
-        Map.put(acc, key, value)
-      end
-    end
-  end
-
 end
+

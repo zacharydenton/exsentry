@@ -96,24 +96,27 @@ defmodule ExSentry.Client do
   end
 
 
+  @spec capture_exception(Exception.t, [tuple], [atom: any], %State{}) :: pid
   def capture_exception(exception, trace, opts, state) do
     opts
     |> Dict.put(:message, Exception.message(exception))
-    |> Dict.put(:stacktrace, ExSentry.Message.format_stacktrace(trace))
-    |> ExSentry.Message.basic_payload
+    |> Dict.put(:stacktrace, ExSentry.Model.Stacktrace.from_stacktrace(trace))
+    |> ExSentry.Model.Message.from_opts
     |> send_payload(state)
   end
 
+  @spec capture_message(String.t, [atom: any], %State{}) :: pid
   def capture_message(message, opts, state) do
     opts
     |> Dict.put(:message, message)
-    |> ExSentry.Message.basic_payload
+    |> ExSentry.Model.Message.from_opts
     |> send_payload(state)
   end
 
+  @spec send_payload(map, %State{}) :: pid
   defp send_payload(payload, state) do
     headers = [
-      {"X-Sentry-Auth", ExSentry.Message.get_auth_header_value(state)},
+      {"X-Sentry-Auth", ExSentry.Model.Message.get_auth_header_value(state)},
       {"Content-Type", "application/json"}
     ]
     sender_opts = Application.get_env(:exsentry, :sender_opts) || %{}
