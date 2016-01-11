@@ -13,6 +13,12 @@ defmodule ExSentry.Mixfile do
        "coveralls.detail": :test,
        "coveralls.post": :test
      ],
+     description: "ExSentry is a client for the Sentry error reporting platform.",
+     package: [
+       maintainers: ["pete gamache", "Appcues"],
+       licenses: ["MIT"],
+       links: %{GitHub: "https://github.com/appcues/exsentry"}
+     ],
      deps: deps]
   end
 
@@ -34,7 +40,6 @@ defmodule ExSentry.Mixfile do
       {:ex_spec, "~> 1.0.0", only: :test},
       {:mock, "~> 0.1.1", only: :test},
       {:excoveralls, "~> 0.4.3", only: :test},
-      {:mock, "~> 0.1.1", only: :test},
     ]
   end
 end
