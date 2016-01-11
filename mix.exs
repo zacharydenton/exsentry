@@ -30,12 +30,12 @@ defmodule ExSentry.Mixfile do
 
   defp deps do
     [
-      {:fuzzyurl, "~> 0.8.1"},
+      {:fuzzyurl, "~> 0.8"},
       {:uuid, "~> 1.1"},
-      {:timex, "~> 0.19.2"},
+      {:timex, "~> 0.19"},
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
-      {:httpotion, "~> 2.1.0"},
-      {:poison, "~> 1.5.0"},
+      {:httpotion, "~> 2.1"},
+      {:poison, "~> 1.5"},
       {:plug, "~> 1.0"},
       {:ex_spec, "~> 1.0.0", only: :test},
       {:mock, "~> 0.1.1", only: :test},
