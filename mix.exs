@@ -33,7 +33,7 @@ defmodule ExSentry.Mixfile do
       {:fuzzyurl, "~> 0.8"},
       {:uuid, "~> 1.1"},
       {:timex, ">= 0.19.0"},
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
+      {:ibrowse, "~> 4.2.2", [hex: :ibrowse]},
       {:httpotion, "~> 2.1"},
       {:poison, "~> 1.5"},
       {:plug, "~> 1.0"},
