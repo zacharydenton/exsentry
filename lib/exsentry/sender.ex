@@ -58,7 +58,7 @@ defmodule ExSentry.Sender do
   end
 
   ## Handles the sending of requests.
-  def handle_cast({:send, url, headers, body, retries}=arg, state) do
+  def handle_cast({:send, url, headers, body, retries}, state) do
     delay = state.delay * :math.pow(2, retries)
     delay_with_jitter = trunc(delay + 0.1 * (:random.uniform) * delay)
     log = if state.logging do

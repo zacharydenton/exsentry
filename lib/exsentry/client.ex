@@ -38,7 +38,7 @@ defmodule ExSentry.Client do
   def init(args \\ %{}) do
     dsn = Map.get(args, :dsn) || Application.get_env(:exsentry, :dsn)
     cond do
-      Mix.env == :test || dsn == "" ->
+      dsn == "" ->
         {:ok, %State{status: :disabled}}
       is_nil(dsn) ->
         {:ok, %State{status: :no_dsn}}
@@ -101,7 +101,7 @@ defmodule ExSentry.Client do
     opts
     |> Dict.put(:message, Exception.message(exception))
     |> Dict.put(:stacktrace, ExSentry.Model.Stacktrace.from_stacktrace(trace))
-    |> ExSentry.Model.Message.from_opts
+    |> ExSentry.Model.Payload.from_opts
     |> send_payload(state)
   end
 
@@ -109,14 +109,14 @@ defmodule ExSentry.Client do
   def capture_message(message, opts, state) do
     opts
     |> Dict.put(:message, message)
-    |> ExSentry.Model.Message.from_opts
+    |> ExSentry.Model.Payload.from_opts
     |> send_payload(state)
   end
 
   @spec send_payload(map, %State{}) :: pid
   defp send_payload(payload, state) do
     headers = [
-      {"X-Sentry-Auth", ExSentry.Model.Message.get_auth_header_value(state)},
+      {"X-Sentry-Auth", ExSentry.Model.Payload.get_auth_header_value(state)},
       {"Content-Type", "application/json"}
     ]
     sender_opts = Application.get_env(:exsentry, :sender_opts) || %{}

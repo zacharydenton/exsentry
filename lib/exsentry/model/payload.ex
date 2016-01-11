@@ -1,6 +1,6 @@
-defmodule ExSentry.Model.Message do
+defmodule ExSentry.Model.Payload do
   @moduledoc ~S"""
-  ExSentry.Model.Message represents the entire request body of an
+  ExSentry.Model.Payload represents the entire request body of an
   HTTP POST request to Sentry.
   """
 
@@ -66,7 +66,7 @@ defmodule ExSentry.Model.Message do
     logentry = opts[:logentry]
     query = opts[:query]
 
-    %ExSentry.Model.Message{
+    %ExSentry.Model.Payload{
       platform: "other", ## no official love for Elixir yet
       release: versions[:exsentry],
       modules: versions,
