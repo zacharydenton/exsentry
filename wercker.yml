@@ -38,7 +38,13 @@ build:
     - script:
         name: coveralls
         code: |
-          mix coveralls.post --sha \
-            $(git log -1 2>/dev/null | sed -e 's/^commit \(\d*\)/\1/p; d')
-
+          MESSAGE=$(git log -1 2>/dev/null | tail -n+5) && \
+          BRANCH=$(git status 2>/dev/null | sed -e 's/^On branch \(\d*\)/\1/p; d') && \
+          COMMITTER=$(git log -1 2>/dev/null | sed -e 's/^Author: \(\d*\)/\1/p; d') && \
+          SHA=$(git log -1 2>/dev/null | sed -e 's/^commit \(\d*\)/\1/p; d') && \
+          mix coveralls.post \
+            --message "$MESSAGE" \
+            --branch "$BRANCH" \
+            --committer "$COMMITTER" \
+            --sha "$SHA"
 
