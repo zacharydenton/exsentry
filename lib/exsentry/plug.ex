@@ -1,4 +1,20 @@
 defmodule ExSentry.Plug do
+  @moduledoc ~S"""
+  ExSentry.Plug is a Plug error handler which can be used to automatically
+  intercept and report to Sentry any exceptions encountered by a Plug-based
+  web application.
+
+  To use, configure `mix.exs` and `config.exs` as described in README.md,
+  then add `use ExSentry.Plug` near the top of your webapp's plug stack,
+  for example:
+
+      defmodule MyApp.Router do
+        use MyApp.Web, :router
+        use ExSentry.Plug
+
+        pipeline :browser do
+        ...
+  """
 
   defmacro __using__(_env) do
     quote do
@@ -25,6 +41,5 @@ defmodule ExSentry.Plug do
     st = ExSentry.Model.Stacktrace.from_stacktrace(stack)
     ExSentry.capture_exception(exception, request: req, stacktrace: st)
   end
-
 end
 
