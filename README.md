@@ -16,20 +16,20 @@ Beta quality, offered without guarantee, YMMV, etc.
 
 1. Add exsentry to your list of dependencies in `mix.exs`:
 
-      def deps do
-        [{:exsentry, "~> 0.1.3"}]
-      end
+        def deps do
+          [{:exsentry, "~> 0.1.3"}]
+        end
 
 2. If using as an OTP application, ensure exsentry is started
    before your application in `mix.exs`:
 
-      def application do
-        [applications: [:exsentry]]
-      end
+        def application do
+          [applications: [:exsentry]]
+        end
 
    And configure your Sentry DSN in `config.exs`:
 
-      config :exsentry, dsn: "your-dsn-here"
+        config :exsentry, dsn: "your-dsn-here"
 
 
 ## Usage
