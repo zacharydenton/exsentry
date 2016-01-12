@@ -63,6 +63,7 @@ defmodule ExSentry do
   @doc ~S"""
   Starts a Sentry client, and returns the PID of the client process.
   """
+  @spec new(String.t, [atom: any]) :: GenServer.server
   def new(dsn, opts \\ []) do
     {:ok, pid} = GenServer.start_link(ExSentry.Client, %{dsn: dsn, opts: opts})
     pid
