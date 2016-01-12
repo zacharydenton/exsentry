@@ -18,7 +18,7 @@ defmodule ExSentry.Sender do
 
   @doc ~S"""
   Sends a POST request to the given Sentry URL with the given headers and body,
-  spawning a new ExSentry.Sender process to handle it.
+  using the given ExSentry.Sender PID.
   Handles retry, exponential backoff, and error logging.
 
   Returns pid of new ExSentry.Sender process.
@@ -31,7 +31,7 @@ defmodule ExSentry.Sender do
 
   @doc ~S"""
   Sends a POST request to the given Sentry URL with the given headers and body,
-  using the given ExSentry.Sender PID.
+  spawning a new ExSentry.Sender process to handle it.
   Handles retry, exponential backoff, and error logging.
 
   Returns pid of ExSentry.Sender process.

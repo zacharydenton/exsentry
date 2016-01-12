@@ -19,6 +19,7 @@ defmodule ExSentry.Mixfile do
        licenses: ["MIT"],
        links: %{GitHub: "https://github.com/appcues/exsentry"}
      ],
+     docs: [main: ExSentry],
      deps: deps]
   end
 
