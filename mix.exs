@@ -40,6 +40,8 @@ defmodule ExSentry.Mixfile do
       {:ex_spec, "~> 1.0.0", only: :test},
       {:mock, "~> 0.1.1", only: :test},
       {:excoveralls, "~> 0.4.3", only: :test},
+      {:earmark, "~> 0.1", only: :dev},
+      {:ex_doc, "~> 0.11", only: :dev},
     ]
   end
 end

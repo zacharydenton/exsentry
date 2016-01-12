@@ -17,7 +17,7 @@ Beta quality, offered without guarantee, YMMV, etc.
 1. Add exsentry to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:exsentry, "~> 0.1.3"}]
+          [{:exsentry, "~> 0.2.0"}]
         end
 
 2. If using as an OTP application, ensure exsentry is started
