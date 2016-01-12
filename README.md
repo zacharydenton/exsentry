@@ -2,7 +2,8 @@
 
 [![wercker status](https://app.wercker.com/status/e3f67da2ef0e409a62bb6bd65a50e7d7/s/master "wercker status")](https://app.wercker.com/project/bykey/e3f67da2ef0e409a62bb6bd65a50e7d7)
 [![Hex.pm Version](http://img.shields.io/hexpm/v/exsentry.svg?style=flat)](https://hex.pm/packages/exsentry)
-[![Coverage Status](https://coveralls.io/repos/appcues/exsentry/badge.svg?branch=&service=github)](https://coveralls.io/github/appcues/exsentry?branch=)
+[![Coverage
+Status](https://coveralls.io/repos/appcues/exsentry/badge.svg?branch=master&service=github)](https://coveralls.io/github/appcues/exsentry?branch=master)
 
 An Elixir client library for the [Sentry](https://getsentry.com) error
 reporting platform.
