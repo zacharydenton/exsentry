@@ -23,7 +23,7 @@ defmodule ExSentry.Sender do
 
   Returns pid of new ExSentry.Sender process.
   """
-  @spec send_request(pid, String.t, [{String.t, any}], String.t) :: pid
+  @spec send_request(pid, String.t, [{String.t, String.t}], String.t) :: pid
   def send_request(pid, url, headers, body) do
     GenServer.cast(pid, {:send, url, headers, body, 0})
     pid
@@ -36,7 +36,7 @@ defmodule ExSentry.Sender do
 
   Returns pid of ExSentry.Sender process.
   """
-  @spec send_request(String.t, [{String.t, any}], String.t) :: pid
+  @spec send_request(String.t, [{String.t, String.t}], String.t) :: pid
   def send_request(url, headers, body) do
     {:ok, pid} = GenServer.start_link(ExSentry.Sender, %{delay: 1000})
     send_request(pid, url, headers, body)

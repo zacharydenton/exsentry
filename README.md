@@ -7,9 +7,12 @@
 An Elixir client library for the [Sentry](https://getsentry.com) error
 reporting platform.
 
+[Full ExSentry documentation is available on
+Hexdocs.pm.](http://hexdocs.pm/exsentry/ExSentry.html)
+
 Not an officially supported Sentry client.
 
-Beta quality, offered without guarantee, YMMV, etc.
+Offered without guarantee, YMMV, etc.
 
 
 ## Installation
