@@ -12,11 +12,13 @@ defmodule ExSentry.Model.Stacktrace do
   Returns an ExSentry.Model.Stacktrace based on the given Erlang/Elixir
   stacktrace (as returned by `System.stacktrace/0`).
   """
+  @spec from_stacktrace([tuple]) :: %ExSentry.Model.Stacktrace{}
   def from_stacktrace(stacktrace) do
     frames = stacktrace |> Enum.map(&format_stacktrace_entry(&1))
     %ExSentry.Model.Stacktrace{frames: frames}
   end
 
+  @spec format_stacktrace_entry(tuple) :: map
   defp format_stacktrace_entry(entry) do
     case entry do
       {module, fname, arity, file_and_line} ->
@@ -28,6 +30,7 @@ defmodule ExSentry.Model.Stacktrace do
     end
   end
 
+  @spec file_and_line_map([atom: any]) :: map
   defp file_and_line_map(file_and_line_dict) do
     file = file_and_line_dict[:file]
     line = file_and_line_dict[:line]

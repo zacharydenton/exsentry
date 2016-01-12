@@ -18,6 +18,7 @@ defmodule ExSentry.Model.Request do
   Returns a JSON-compatible map describing the given `conn`, adhering
   to the Sentry "Http" interface.
   """
+  @spec from_conn(%Plug.Conn{}) :: %ExSentry.Model.Request{}
   def from_conn(conn) do
     {:ok, data, _conn} = Plug.Conn.read_body(conn, length: 8192)
     headers = conn.req_headers |> ExSentry.Utils.merge_http_headers
@@ -40,6 +41,7 @@ defmodule ExSentry.Model.Request do
     }
   end
 
+  @spec format_ip(tuple) :: String.t
   defp format_ip({a, b, c, d}), do: "#{a}.#{b}.#{c}.#{d}"
 
 end

@@ -115,13 +115,16 @@ defmodule ExSentry.Client do
 
   @spec send_payload(map, %State{}) :: pid
   defp send_payload(payload, state) do
+    stripped_payload = payload
+                       |> Map.from_struct
+                       |> ExSentry.Utils.strip_nils_from_map
     headers = [
       {"X-Sentry-Auth", ExSentry.Model.Payload.get_auth_header_value(state)},
       {"Content-Type", "application/json"}
     ]
     sender_opts = Application.get_env(:exsentry, :sender_opts) || %{}
     {:ok, pid} = GenServer.start_link(ExSentry.Sender, sender_opts)
-    ExSentry.Sender.send_request(pid, state.url, headers, payload)
+    ExSentry.Sender.send_request(pid, state.url, headers, stripped_payload)
   end
 
 end

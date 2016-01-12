@@ -3,6 +3,8 @@ defmodule ExSentry do
   ExSentry is an Elixir interface to the Sentry error reporting platform.
 
   ExSentry may be used as an OTP application or as a standalone client.
+  ExSentry.Plug can be used to intercept and report exceptions encountered
+  by a Plug-based web application.
 
   ## Standalone example
 
@@ -43,6 +45,18 @@ defmodule ExSentry do
         something_that_might_raise()
       end
 
+  ## Plug example
+
+  To use ExSentry as a Plug error handler, follow the OTP configuration
+  instructions, then put `use ExSentry.Plug` wherever your Plug stack is
+  defined, for instance in `web/router.ex` in a Phoenix application:
+
+      defmodule MyApp.Router do
+        use MyApp.Web, :router
+        use ExSentry.Plug
+
+        pipeline :browser do
+        ...
   """
 
 

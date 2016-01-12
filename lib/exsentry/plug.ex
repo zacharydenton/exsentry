@@ -36,6 +36,7 @@ defmodule ExSentry.Plug do
     end
   end
 
+  @spec handle_errors(%Plug.Conn{}, map) :: :ok
   def handle_errors(conn, %{reason: exception, stack: stack}) do
     req = ExSentry.Model.Request.from_conn(conn)
     st = ExSentry.Model.Stacktrace.from_stacktrace(stack)

@@ -1,7 +1,13 @@
 defmodule ExSentry.Utils do
+  @moduledoc ~S"""
+  Various utility functions that don't fit anywhere else.
+  Not intended for end users.
+  """
+
   @doc ~S"""
   Returns the string-formatted version of the given app.
   """
+  @spec version(atom) :: String.t
   def version(app \\ :exsentry) do
     Application.loaded_applications
     |> Enum.filter(&(elem(&1, 0) == app))
@@ -13,6 +19,7 @@ defmodule ExSentry.Utils do
   @doc ~S"""
   Returns a map of {app: version} pairs.
   """
+  @spec versions :: map
   def versions do
     Application.loaded_applications
     |> Enum.reduce(%{}, fn ({app, _desc, ver}, acc) ->
@@ -29,6 +36,7 @@ defmodule ExSentry.Utils do
       iex> headers |> ExSentry.Utils.merge_http_headers
       %{"header1" => "value1, value3", "header2" => "value2"}
   """
+  @spec merge_http_headers([{String.t, String.t}]) :: map
   def merge_http_headers(headers) do
     Enum.reduce headers, %{}, fn ({key, value}, acc) ->
       if Map.has_key?(acc, key) do
@@ -55,11 +63,26 @@ defmodule ExSentry.Utils do
     |> Enum.map(fn ({k, v}) -> [k, v] end)
   end
 
-
+  @doc ~S"""
+  Returns the number of seconds since the Unix epoch.
+  """
   @spec unixtime :: integer
   def unixtime do
     {mega, sec, _microsec} = :os.timestamp
     mega * 1000000 + sec
+  end
+
+  @doc ~S"""
+  Returns a copy of `map` with all nil values (and their keys) removed.
+
+      iex> %{a: 1, b: nil, c: 3} |> ExSentry.Utils.strip_nils_from_map
+      %{a: 1, c: 3}
+  """
+  @spec strip_nils_from_map(map) :: map
+  def strip_nils_from_map(map) do
+    Enum.reduce map, %{}, fn ({k,v}, acc) ->
+      if is_nil(v), do: acc, else: Map.put(acc, k, v)
+    end
   end
 end
 
