@@ -1,12 +1,41 @@
 defmodule ExSentry do
-  @moduledoc ~S"""
+  @moduledoc ~s"""
   ExSentry is an Elixir interface to the Sentry error reporting platform.
 
-  ExSentry may be used as an OTP application or as a standalone client.
+  ExSentry may be used as an OTP application with a client configured by
+  `config.exs`, or as a standalone client configured manually.
   ExSentry.Plug can be used to intercept and report exceptions encountered
   by a Plug-based web application.
 
-  ## Standalone example
+
+  ## Installation
+
+  1. Add exsentry to your list of dependencies in `mix.exs`:
+
+          def deps do
+            [{:exsentry, "~> #{ExSentry.Mixfile.project[:version]}"}]
+          end
+
+  2. Ensure exsentry is started and packaged with your application,
+     in `mix.exs`:
+
+          def application do
+            [applications: [:exsentry]]
+          end
+
+  3. Optional: To configure the default ExSentry client, specify your
+     Sentry DSN in `config.exs`:
+
+          config :exsentry, dsn: "your-dsn-here"
+
+
+  ## Usage
+
+  ExSentry can be used as a manually-configured standalone client,
+  as a `config.exs`-configured OTP application,
+  or as a Plug in your webapp's plug stack (e.g., Phoenix router).
+
+  ### Standalone
 
   Create a client process like this:
 
@@ -22,20 +51,14 @@ defmodule ExSentry do
         something_that_might_raise()
       end
 
-  ## OTP Application example
 
-  To use the OTP Application behavior, place `:exsentry` in
-  the `mix.exs` file's `application/1` function:
+  ### OTP Application
 
-      def application do
-        [applications: [:exsentry]]
-      end
-
-  And add your Sentry DSN to `config.exs`:
+  If you've configured `config.exs` as described in the README:
 
       config :exsentry, dsn: "your-dsn-here"
 
-  Then, in your code:
+  You can invoke ExSentry without explicitly creating a client:
 
       ExSentry.capture_message("Hello world!")
 
@@ -45,9 +68,13 @@ defmodule ExSentry do
         something_that_might_raise()
       end
 
-  ## Plug example
 
-  To use ExSentry as a Plug error handler, follow the OTP configuration
+  ### Plug
+
+  ExSentry can be used as a Plug error handler, to automatically inform
+  Sentry of any exceptions encountered within your web application.
+
+  To use ExSentry as a Plug error handler, follow all configuration
   instructions, then put `use ExSentry.Plug` wherever your Plug stack is
   defined, for instance in `web/router.ex` in a Phoenix application:
 
@@ -57,6 +84,14 @@ defmodule ExSentry do
 
         pipeline :browser do
         ...
+
+
+  ## Authorship and License
+
+  ExSentry is copyright 2015-2016 Appcues, Inc.
+
+  ExSentry is released under the
+  [MIT License](https://github.com/appcues/exsentry/blob/master/LICENSE.txt).
   """
 
 
