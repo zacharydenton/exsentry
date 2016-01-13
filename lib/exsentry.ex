@@ -10,13 +10,13 @@ defmodule ExSentry do
 
   ## Installation
 
-  1. Add exsentry to your list of dependencies in `mix.exs`:
+  1. Add ExSentry to your list of dependencies in `mix.exs`:
 
           def deps do
             [{:exsentry, "~> #{ExSentry.Mixfile.project[:version]}"}]
           end
 
-  2. Ensure exsentry is started and packaged with your application,
+  2. Ensure ExSentry is started and packaged with your application,
      in `mix.exs`:
 
           def application do
