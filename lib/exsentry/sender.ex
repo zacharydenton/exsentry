@@ -78,16 +78,16 @@ defmodule ExSentry.Sender do
                 e ->
                   %{status_code: 555,
                     exception: e,
-                    headers: ["X-Sentry-Error": "Request timed out"]}
+                    headers: %{"X-Sentry-Error": "Request timed out"}}
              end
-      x_sentry_error = Keyword.get(resp.headers, :"X-Sentry-Error", "(no error given)")
+      x_sentry_error = Map.get(resp.headers, :"X-Sentry-Error", "(no error given)")
 
       case div(resp.status_code, 100) do
         2 -> # success
           stop(self, %{state | status: :success})
 
         3 -> # redirect, follow it
-          location = Keyword.get(resp.headers, :"Location", "")
+          location = Map.get(resp.headers, :"Location", "")
           log.(:info, "ExSentry got HTTP redirect, following it.")
           log.(:info, "Location: #{location}")
           :timer.sleep(delay_with_jitter)
@@ -120,4 +120,3 @@ defmodule ExSentry.Sender do
   end
 
 end
-

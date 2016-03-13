@@ -10,11 +10,11 @@ defmodule ExSentry.SenderTest do
     {:ok, sender: pid}
   end
 
-  @response_1xx %{status_code: 100, headers: []}
-  @response_2xx %{status_code: 200, headers: []}
-  @response_3xx %{status_code: 301, headers: ["Location": "https://example.com"]}
-  @response_4xx %{status_code: 400, headers: ["X-Sentry-Error": "omg"]}
-  @response_5xx %{status_code: 503, headers: ["X-Sentry-Error": "lol"]}
+  @response_1xx %{status_code: 100, headers: %{}}
+  @response_2xx %{status_code: 200, headers: %{}}
+  @response_3xx %{status_code: 301, headers: %{"Location": "https://example.com"}}
+  @response_4xx %{status_code: 400, headers: %{"X-Sentry-Error": "omg"}}
+  @response_5xx %{status_code: 503, headers: %{"X-Sentry-Error": "lol"}}
 
   describe "send_request/3" do
     it "launches and stops server automatically" do
@@ -92,4 +92,3 @@ defmodule ExSentry.SenderTest do
   end
 
 end
-
