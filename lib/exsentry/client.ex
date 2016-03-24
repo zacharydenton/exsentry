@@ -1,4 +1,6 @@
 defmodule ExSentry.Client do
+  require Logger
+
   @moduledoc ~S"""
   A GenServer which handles the capture of message/exception information
   to Sentry.  Not intended for end users' direct usage; use `ExSentry`
@@ -101,33 +103,50 @@ defmodule ExSentry.Client do
 
   @spec capture_exception(Exception.t, [tuple], [atom: any], %State{}) :: pid
   def capture_exception(exception, trace, opts, state) do
-    opts
-    |> Dict.put(:message, Exception.message(exception))
-    |> Dict.put(:stacktrace, ExSentry.Model.Stacktrace.from_stacktrace(trace))
-    |> ExSentry.Model.Payload.from_opts
-    |> send_payload(state)
+    safely_do fn ->
+      opts
+      |> Dict.put(:message, Exception.message(exception))
+      |> Dict.put(:stacktrace, ExSentry.Model.Stacktrace.from_stacktrace(trace))
+      |> ExSentry.Model.Payload.from_opts
+      |> send_payload(state)
+    end
   end
 
   @spec capture_message(String.t, [atom: any], %State{}) :: pid
   def capture_message(message, opts, state) do
-    opts
-    |> Dict.put(:message, message)
-    |> ExSentry.Model.Payload.from_opts
-    |> send_payload(state)
+    safely_do fn ->
+      opts
+      |> Dict.put(:message, message)
+      |> ExSentry.Model.Payload.from_opts
+      |> send_payload(state)
+    end
   end
 
   @spec send_payload(map, %State{}) :: pid
   defp send_payload(payload, state) do
-    stripped_payload = payload
-                       |> Map.from_struct
-                       |> ExSentry.Utils.strip_nils_from_map
-    headers = [
-      {"X-Sentry-Auth", ExSentry.Model.Payload.get_auth_header_value(state)},
-      {"Content-Type", "application/json"}
-    ]
-    sender_opts = Application.get_env(:exsentry, :sender_opts) || %{}
-    {:ok, pid} = GenServer.start_link(ExSentry.Sender, sender_opts)
-    ExSentry.Sender.send_request(pid, state.url, headers, stripped_payload)
+    safely_do fn ->
+      stripped_payload = payload
+                         |> Map.from_struct
+                         |> ExSentry.Utils.strip_nils_from_map
+      headers = [
+        {"X-Sentry-Auth", ExSentry.Model.Payload.get_auth_header_value(state)},
+        {"Content-Type", "application/json"}
+      ]
+      sender_opts = Application.get_env(:exsentry, :sender_opts) || %{}
+      {:ok, pid} = GenServer.start_link(ExSentry.Sender, sender_opts)
+      ExSentry.Sender.send_request(pid, state.url, headers, stripped_payload)
+    end
+  end
+
+  ## Under no circumstances is ExSentry itself allowed to crash.
+  defp safely_do(func) do
+    try do
+      func.()
+    rescue
+      e ->
+        Exception.format(:error, e) |> Logger.error
+        {:error, e}
+    end
   end
 
 end
