@@ -1,3 +1,9 @@
+0.3.0
+
+Prevent ExSentry itself from ever raising an exception due to user
+input.
+
+
 0.2.2
 
 * Updated Timex and adjusted HTTPoison code. Thanks
