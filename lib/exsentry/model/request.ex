@@ -20,7 +20,12 @@ defmodule ExSentry.Model.Request do
   """
   @spec from_conn(%Plug.Conn{}) :: %ExSentry.Model.Request{}
   def from_conn(conn) do
-    {:ok, data, _conn} = Plug.Conn.read_body(conn, length: 8192)
+    data = case conn.params do
+             %Plug.Conn.Unfetched{} ->
+               nil
+             params ->
+               params
+           end
     headers = conn.req_headers |> ExSentry.Utils.merge_http_headers
     cookies = case conn.req_cookies do
                 %Plug.Conn.Unfetched{} ->
